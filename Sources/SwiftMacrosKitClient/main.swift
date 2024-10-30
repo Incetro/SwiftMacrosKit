@@ -1,8 +1,28 @@
 import SwiftMacrosKit
+import SwiftUI
 
-let a = 17
-let b = 25
+// MARK: - DynamicStringWrapper+Example
 
-let (result, code) = #stringify(a + b)
+@DynamicStringWrapper
+public struct SomeStruct {
+    public var optionalString: String?
+    public var string: String
+}
 
-print("The value \(result) was produced by the code \"\(code)\"")
+// MARK: - WithLocalizationUpdater+Example
+
+@WithLocalizationUpdater
+public struct SomeView: View {
+    
+    public var body: some View {
+        Text("Hello world!")
+    }
+}
+
+// MARK: - ClosureAccessor+Example
+
+@ClosureAccessor
+public var someVariable: Int
+public func someVariableClosure() -> Int {
+    0
+}
