@@ -35,12 +35,12 @@ public struct DynamicStringWrapperMacro: MemberMacro {
         in context: some MacroExpansionContext
     ) throws -> [DeclSyntax] {
         
-        // Ensure the macro is applied to a struct
+        /// Ensure the macro is applied to a struct
         guard let structDecl = declaration.as(StructDeclSyntax.self) else {
             throw MacroError(message: "Macro can only be applied to a struct.")
         }
         
-        // Collects properties that are `var` and are `String` or `String?`
+        /// Collects properties that are `var` and are `String` or `String?`
         let properties = structDecl.memberBlock.members.compactMap { member -> (name: String, isOptional: Bool)? in
             guard let variable = member.decl.as(VariableDeclSyntax.self),
                   let binding = variable.bindings.first,
@@ -52,13 +52,13 @@ public struct DynamicStringWrapperMacro: MemberMacro {
             return (name: identifier.identifier.text, isOptional: isOptional)
         }
         
-        // Arrays to hold generated closures, initializer parameters, assignments, and Equatable comparisons
+        /// Arrays to hold generated closures, initializer parameters, assignments, and Equatable comparisons
         var closureDeclarations: [DeclSyntax] = []
         var initializerParams: [String] = []
         var initializerAssignments: [String] = []
         var equatableComparisons: [String] = []
         
-        // Generate closures, initializer parameters, and Equatable comparisons
+        /// Generate closures, initializer parameters, and Equatable comparisons
         for property in properties {
             let closureName = "\(property.name)Closure"
             let closureDeclaration = """
@@ -76,7 +76,7 @@ public struct DynamicStringWrapperMacro: MemberMacro {
             equatableComparisons.append("lhs.\(property.name) == rhs.\(property.name)")
         }
         
-        // Create the initializer with parameters and assignments
+        /// Create the initializer with parameters and assignments
         let initializer = """
         public init(
             \(initializerParams.joined(separator: ",\n    "))
@@ -85,7 +85,7 @@ public struct DynamicStringWrapperMacro: MemberMacro {
         }
         """
         
-        // Create the `Equatable` method
+        /// Create the `Equatable` method
         let equatableMethod = """
         public static func == (lhs: \(structDecl.name.text), rhs: \(structDecl.name.text)) -> Bool {
             return \(equatableComparisons.joined(separator: " && "))

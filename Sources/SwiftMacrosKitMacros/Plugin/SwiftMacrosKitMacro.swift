@@ -9,5 +9,6 @@ struct SwiftMacrosKitPlugin: CompilerPlugin {
         DynamicStringWrapperMacro.self,
         WithLocalizationUpdaterMacro.self,
         ClosureAccessorMacro.self,
+        AutoInitMacro.self
     ]
 }

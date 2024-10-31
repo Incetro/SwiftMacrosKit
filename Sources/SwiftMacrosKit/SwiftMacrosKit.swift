@@ -103,3 +103,48 @@ public macro ClosureAccessor() = #externalMacro(module: "SwiftMacrosKitMacros", 
 /// In this example, `localizationUpdater` observes locale changes and triggers a SwiftUI view update automatically.
 @attached(member, names: arbitrary)
 public macro WithLocalizationUpdater() = #externalMacro(module: "SwiftMacrosKitMacros", type: "WithLocalizationUpdaterMacro")
+
+// MARK: - AutoInitMacro
+
+/// A macro that generates a public initializer for a struct, handling various property types,
+/// including closures and optional values.
+///
+/// This macro:
+/// - Adds `@escaping` for non-optional closures.
+/// - Provides default values for optional closures and optional properties:
+///   - If a property is an optional closure (`() -> Value?`), it sets a default value of `{ nil }()`.
+///   - If a property is optional (e.g., `String?`), it assigns a default value of `nil`.
+///
+/// - Properties that are non-optional and not closures are required parameters in the initializer.
+///
+/// Example usage:
+/// ```swift
+/// @AutoInit
+/// public struct ExampleStruct {
+///     public let name: String
+///     public let age: Int?
+///     public let onComplete: () -> Void
+///     public let optionalClosure: (() -> String?)?
+/// }
+/// ```
+///
+/// Generated initializer:
+/// ```swift
+/// public init(
+///     name: String,
+///     age: Int? = nil,
+///     onComplete: @escaping () -> Void,
+///     optionalClosure: (() -> String?)? = nil
+/// ) {
+///     self.name = name
+///     self.age = age
+///     self.onComplete = onComplete
+///     self.optionalClosure = optionalClosure
+/// }
+/// ```
+///
+/// - Attributes:
+///   - `@attached(member, names: arbitrary)`: This macro attaches additional member declarations,
+///     specifically an initializer, to the struct it decorates.
+@attached(member, names: arbitrary)
+public macro AutoInit() = #externalMacro(module: "SwiftMacrosKitMacros", type: "AutoInitMacro")

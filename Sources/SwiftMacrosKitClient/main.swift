@@ -26,3 +26,14 @@ public var someVariable: Int
 public func someVariableClosure() -> Int {
     0
 }
+
+// MARK: - AutoInit+Example
+
+@AutoInit
+public struct ExampleStruct {
+    public let name: String
+    public let age: Int?
+    public let onComplete: () -> Void
+    public let optionalClosure: (() -> String)?
+    public let optionalClosureResult: () -> String?
+}
