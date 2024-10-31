@@ -91,10 +91,14 @@ public struct DynamicStringWrapperMacro: MemberMacro {
             return \(equatableComparisons.joined(separator: " && "))
         }
         """
-        
-        return closureDeclarations +
-               [DeclSyntax(stringLiteral: initializer),
-                DeclSyntax(stringLiteral: equatableMethod)]
+        if equatableComparisons.isEmpty {
+            return closureDeclarations +
+                   [DeclSyntax(stringLiteral: initializer)]
+        } else {
+            return closureDeclarations +
+                   [DeclSyntax(stringLiteral: initializer),
+                    DeclSyntax(stringLiteral: equatableMethod)]
+        }
     }
 }
 

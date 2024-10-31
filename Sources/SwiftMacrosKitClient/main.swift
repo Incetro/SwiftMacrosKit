@@ -5,8 +5,6 @@ import SwiftUI
 
 @DynamicStringWrapper
 public struct SomeStruct {
-    public var optionalString: String?
-    public var string: String
 }
 
 // MARK: - WithLocalizationUpdater+Example
@@ -36,4 +34,7 @@ public struct ExampleStruct {
     public let onComplete: () -> Void
     public let optionalClosure: (() -> String)?
     public let optionalClosureResult: () -> String?
+    public static var test: String {
+        ""
+    }
 }

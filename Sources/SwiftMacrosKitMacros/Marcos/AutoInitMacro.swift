@@ -36,12 +36,21 @@ public struct AutoInitMacro: MemberMacro {
                 return nil
             }
             
+            for modifier in variable.modifiers {
+                if modifier.as(DeclModifierSyntax.self)?.name.text == "static" {
+                    return nil
+                }
+            }
+            
             let type = typeAnnotation.type.description.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !type.contains("static") else {
+                return nil
+            }
             let isClosure = type.hasPrefix("(") && type.contains("->")
             let returnsOptional = isClosure && type.contains("->") && type.hasSuffix("?")
             let isOptional = isClosure ? type.hasSuffix(")?") : type.hasSuffix("?")
-            
-            return (name: identifier.identifier.text, type: type, isClosure: isClosure, returnsOptional: returnsOptional, isOptional: isOptional)
+            let name = identifier.identifier.text
+            return (name: name, type: type, isClosure: isClosure, returnsOptional: returnsOptional, isOptional: isOptional)
         }
 
         /// Build initializer parameters and assignments
