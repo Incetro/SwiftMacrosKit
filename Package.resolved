@@ -1,5 +1,5 @@
 {
-  "originHash" : "5fe90fe4b795bc82a69d588a9938232e3e82afe5a4833710f40d3eddbc807dc5",
+  "originHash" : "9c18c55ee7320e4c260d16830f361b7a1d6280ae2cca7b750b30e8508a4e1903",
   "pins" : [
     {
       "identity" : "dao",
@@ -42,8 +42,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-syntax.git",
       "state" : {
-        "revision" : "64889f0c732f210a935a0ad7cda38f77f876262d",
-        "version" : "509.1.1"
+        "revision" : "0687f71944021d616d34d922343dcef086855920",
+        "version" : "600.0.1"
       }
     }
   ],
