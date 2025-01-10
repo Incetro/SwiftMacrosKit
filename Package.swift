@@ -20,6 +20,7 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-syntax.git", from: "509.0.0"),
+        .package(url: "https://github.com/Incetro/DAO.git", branch: "master")
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
@@ -37,7 +38,13 @@ let package = Package(
         .target(name: "SwiftMacrosKit", dependencies: ["SwiftMacrosKitMacros"]),
 
         // A client of the library, which is able to use the macro in its own code.
-        .executableTarget(name: "SwiftMacrosKitClient", dependencies: ["SwiftMacrosKit"]),
+        .executableTarget(
+            name: "SwiftMacrosKitClient",
+            dependencies: [
+                "SwiftMacrosKit",
+                .product(name: "SDAO", package: "DAO")
+            ]
+        ),
 
         // A test target used to develop the macro implementation.
         .testTarget(

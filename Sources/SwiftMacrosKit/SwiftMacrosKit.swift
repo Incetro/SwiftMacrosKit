@@ -148,3 +148,8 @@ public macro WithLocalizationUpdater() = #externalMacro(module: "SwiftMacrosKitM
 ///     specifically an initializer, to the struct it decorates.
 @attached(member, names: arbitrary)
 public macro AutoInit() = #externalMacro(module: "SwiftMacrosKitMacros", type: "AutoInitMacro")
+
+// MARK: - DAOMacro
+
+@attached(member, names: arbitrary)
+public macro DAOMacro() = #externalMacro(module: "SwiftMacrosKitMacros", type: "DAOMacro")

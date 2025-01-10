@@ -38,3 +38,22 @@ public struct ExampleStruct {
         ""
     }
 }
+
+// MARK: - DAO+Example
+
+import SDAO
+
+@DAOMacro
+public struct ShortBankAccountPlainObject: Equatable, Codable {
+    
+    // MARK: - Properties
+    
+    /// Account name
+    public let account: String?
+    
+    /// Account balance
+    public let balance: Double
+    
+    /// Acount image url
+    public let imageURL: URL?
+}
