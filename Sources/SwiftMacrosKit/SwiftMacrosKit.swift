@@ -1,6 +1,8 @@
 // The Swift Programming Language
 // https://docs.swift.org/swift-book
 
+import SDAO
+
 /// Automatically generates closures to manage dynamic string properties, useful for localization.
 ///
 /// This macro:
@@ -152,4 +154,5 @@ public macro AutoInit() = #externalMacro(module: "SwiftMacrosKitMacros", type: "
 // MARK: - DAOMacro
 
 @attached(member, names: arbitrary)
+@attached(extension, conformances: Identifiable, Plain)
 public macro DAOMacro() = #externalMacro(module: "SwiftMacrosKitMacros", type: "DAOMacro")

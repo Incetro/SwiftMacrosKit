@@ -5,6 +5,8 @@ import SwiftUI
 
 @DynamicStringWrapper
 public struct SomeStruct {
+    
+    public var someString: String
 }
 
 // MARK: - WithLocalizationUpdater+Example
@@ -42,18 +44,137 @@ public struct ExampleStruct {
 // MARK: - DAO+Example
 
 import SDAO
+import RealmSwift
+
+// MARK: - MainPlainObject
 
 @DAOMacro
-public struct ShortBankAccountPlainObject: Equatable, Codable {
+public struct MainPlainObject: Equatable, Codable {
+
+    public var uniqueId: UniqueID {
+        UniqueID(rawValue: id)
+    }
     
-    // MARK: - Properties
+    public static let staticVariable = "staticVariable"
+
+    // MARK: - Primitive
     
-    /// Account name
-    public let account: String?
+    public let id: String
+    public let optionalString: String?
+    public let string: String
+    public let double: Double
+    public let optionalDouble: Double?
+    public let url: URL
+    public let optionalUrl: URL?
+    public let date: Date
+    public let optionalDate: Date?
+    public let int: Int
+    public let optionalInt: Int?
+
+    // MARK: - IntEnum
     
-    /// Account balance
-    public let balance: Double
+    /// @dao-int-enum
+    public let intEnum: IntEnum
     
-    /// Acount image url
-    public let imageURL: URL?
+    /// @dao-int-enum
+    public let intEnumOptional: IntEnum?
+    
+    /// @dao-int-enum
+    public let intEnumArray: [IntEnum]
+    
+    /// @dao-int-enum
+    public let intEnumArrayOptional: [IntEnum]?
+
+    // MARK: - StringEnum
+
+    /// @dao-string-enum
+    public let stringEnum: StringEnum
+    
+    /// @dao-string-enum
+    public let stringEnumOptional: StringEnum?
+    
+    /// @dao-string-enum
+    /// Come comment
+    public let stringEnumArray: [StringEnum]
+    
+    /// @dao-string-enum
+    public let stringEnumOptionalArray: [StringEnum]?
+
+    // MARK: - OtherPlain
+
+    /// @dao-plain
+    public let plain: SubPlainObject
+    
+    /// @dao-plain
+    public let optionalPlain: SubPlainObject?
+    
+    /// @dao-plain
+    public let plainArray: [SubPlainObject]
+    
+    /// @dao-plain
+    public let optionalPlainArray: [SubPlainObject]?
+}
+
+// MARK: - SubPlainObject
+
+@DAOMacro
+public struct SubPlainObject: Equatable, Codable {
+
+    public var uniqueId: UniqueID {
+        UniqueID(value: id)
+    }
+    // MARK: - Primitive
+    
+    public let id: Int
+    public let optionalString: String?
+    public let string: String
+    public let double: Double
+    public let optionalDouble: Double?
+    public let url: URL
+    public let optionalUrl: URL?
+    public let date: Date
+    public let optionalDate: Date?
+    public let int: Int
+    public let optionalInt: Int?
+    
+    // MARK: - IntEnum
+
+    /// @dao-int-enum
+    public let intEnum: IntEnum
+    
+    /// @dao-int-enum
+    public let intEnumOptional: IntEnum?
+    
+    /// @dao-int-enum
+    public let intEnumArray: [IntEnum]
+    
+    /// @dao-int-enum
+    public let intEnumArrayOptional: [IntEnum]?
+
+    // MARK: - StringEnum
+
+    /// @dao-string-enum
+    public let stringEnum: StringEnum
+    
+    /// @dao-string-enum
+    public let stringEnumOptional: StringEnum?
+    
+    /// @dao-string-enum
+    /// Come comment
+    public let stringEnumArray: [StringEnum]
+    
+    /// @dao-string-enum
+    public let stringEnumOptionalArray: [StringEnum]?
+}
+
+// MARK: - Enums
+
+public enum StringEnum: String, Codable {
+    case case1
+    case case2
+}
+
+public enum IntEnum: Int, Codable {
+    case case1
+    case case2
 }

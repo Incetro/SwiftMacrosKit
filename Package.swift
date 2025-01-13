@@ -19,7 +19,7 @@ let package = Package(
         ),
     ],
     dependencies: [
-        .package(url: "https://github.com/apple/swift-syntax.git", from: "600.0.1"),
+        .package(url: "https://github.com/apple/swift-syntax.git", from: "509.1.1"),
         .package(url: "https://github.com/Incetro/DAO.git", branch: "master")
     ],
     targets: [
@@ -35,7 +35,13 @@ let package = Package(
         ),
 
         // Library that exposes a macro as part of its API, which is used in client programs.
-        .target(name: "SwiftMacrosKit", dependencies: ["SwiftMacrosKitMacros"]),
+        .target(
+            name: "SwiftMacrosKit",
+            dependencies: [
+                "SwiftMacrosKitMacros",
+                .product(name: "SDAO", package: "DAO")
+            ]
+        ),
 
         // A client of the library, which is able to use the macro in its own code.
         .executableTarget(
