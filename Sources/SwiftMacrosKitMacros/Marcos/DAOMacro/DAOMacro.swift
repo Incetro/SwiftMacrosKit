@@ -30,8 +30,11 @@ public struct DAOMacro {
     
     static let numericTypes = [
         "Int", "Int8", "Int16", "Int32", "Int64",
-        "UInt", "UInt8", "UInt16", "UInt32", "UInt64",
-        "Float", "Double", "Float80"
+        "Float", "Double"
+    ]
+    
+    static var typesSupportedRealmProperty = numericTypes.map { "\($0)?" } + [
+        "Bool?"
     ]
     
     static let stringTypes = [
@@ -63,7 +66,9 @@ extension DAOMacro: MemberMacro {
         )
         let modelClass = makeModel(properties: properties)
         let translatorClass = makeTranslator(plainName: structDecl.name.text, properties: properties)
+        let daoAlias = makeDAOAlias(plainName: structDecl.name.text)
         return [
+            daoAlias,
             modelClass,
             translatorClass
         ]
@@ -98,40 +103,37 @@ extension DAOMacro {
         modelValuePath: String,
         property: PropertyPlain
     ) -> String {
-        if !property.isOptional && property.isOptionalInDatabaseModel {
-            return "\(property.name): \(property.name)"
-        }
         switch property.isArray {
         case true:
             switch property.modelType {
             case .stringEnum, .intEnum:
-                return "\(property.name): \(modelValuePath).compactMap({ \(property.typeName)(rawValue: $0) })"
+                return "\(property.name): \(modelValuePath).compactMap({ \(property.clearTypeName)(rawValue: $0) })"
             case .primitive:
-                switch property.typeName {
+                switch property.clearTypeName {
                 case "URL":
-                return "\(property.name): \(modelValuePath).compactMap({ \(property.typeName)(string: $0) })"
+                return "\(property.name): \(modelValuePath).compactMap({ \(property.clearTypeName)(string: $0) })"
                 default:
                     return "\(property.name): \(modelValuePath)"
                 }
             case .plain:
-                return "\(property.name): try \(property.plainName).Translator(configuration: configuration).translate(models: Array(\(modelValuePath)\(property.optionalUnwrapString))"
+                return "\(property.name): try \(property.clearTypeName).Translator(configuration: configuration).translate(models: Array(\(modelValuePath)\(property.defaultValueUnwrapString)))"
             }
         case false:
             switch property.modelType {
             case .stringEnum, .intEnum:
-                return "\(property.name): \(property.typeName)(rawValue: \(modelValuePath)\(property.optionalUnwrapString))"
+                return "\(property.name): \(property.clearTypeName)(rawValue: \(modelValuePath)\(property.defaultValueUnwrapString))\(property.unsafelyUnwrappedString)"
             case .primitive:
-                switch property.typeName {
+                switch property.clearTypeName {
                 case "URL":
-                    return "\(property.name): URL(string: \(modelValuePath)\(property.optionalUnwrapString))"
+                    return "\(property.name): URL(string: \(modelValuePath)\(property.defaultValueUnwrapString))\(property.unsafelyUnwrappedString)"
                 default:
-                    return "\(property.name): \(modelValuePath)\(property.optionalUnwrapString)"
+                    return "\(property.name): \(modelValuePath)\(property.defaultValueUnwrapString)"
                 }
             case .plain:
                 if property.isOptional {
-                    return "\(property.name): \(modelValuePath) == nil ? nil : try \(property.plainName).Translator(configuration: configuration).translate(model: \(modelValuePath).unsafelyUnwrapped)"
+                    return "\(property.name): \(modelValuePath) == nil ? nil : try \(property.clearTypeName).Translator(configuration: configuration).translate(model: \(modelValuePath).unsafelyUnwrapped)"
                 }
-                return "\(property.name): try \(property.plainName).Translator(configuration: configuration).translate(model: \(modelValuePath)"
+                return "\(property.name): try \(property.clearTypeName).Translator(configuration: configuration).translate(model: \(modelValuePath).unsafelyUnwrapped)"
             }
         }
     }

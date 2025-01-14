@@ -23,6 +23,7 @@ extension DAOMacro {
             // MARK: - Aliases
         
             typealias PlainModel = \(plainName)
+            typealias DatabaseModel = \(plainName).DatabaseModel
         
             /// Plain storage
             private lazy var storage = RealmStorage<DatabaseModel>(configuration: self.configuration)
@@ -65,7 +66,7 @@ extension DAOMacro {
     static func generateModelToPlainMapping(properties: [PropertyPlain]) -> String {
         properties.map { property in
             makeInitVariableString(
-                modelValuePath: "model.\(property.name)\(property.shouldUseRealmProperty ? ".value" : "")",
+                modelValuePath: "model.\(property.name)\(property.isShouldUseRealmProperty ? ".value" : "")",
                 property: property
             )
         }.joined(separator: ",\n")

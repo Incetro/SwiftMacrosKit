@@ -84,7 +84,7 @@ extension DAOMacro {
                 initialType: initialType,
                 modelType: modelType
             )
-            return PropertyPlain(
+            let plain = PropertyPlain(
                 plainName: plainName,
                 name: name,
                 realmSupportedType: realmSupportedType,
@@ -93,6 +93,8 @@ extension DAOMacro {
                 isArray: isArray,
                 isOptional: isOptional
             )
+            dump(plain)
+            return plain
         }
     }
     
@@ -113,7 +115,7 @@ extension DAOMacro {
     }
     
     static func makeOptionalObjcType(property: PropertyPlain) -> String {
-        if property.shouldUseRealmProperty {
+        if property.isShouldUseRealmProperty {
             return "let \(property.name) = RealmProperty<\(property.realmSupportedType)?>()"
         } else {
             return "@objc dynamic var \(property.name): \(property.realmSupportedType)? = nil"

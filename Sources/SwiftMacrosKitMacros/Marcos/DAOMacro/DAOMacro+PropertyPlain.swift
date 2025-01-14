@@ -30,10 +30,8 @@ extension DAOMacro {
         
         // MARK: - Useful
         
-        var shouldUseRealmProperty: Bool {
-            (numericTypes.contains(realmSupportedType) || modelType == .intEnum)
-            && (isOptional || !isOptional && realmSupportedDefaultValue == nil)
-            && !isArray
+        var isShouldUseRealmProperty: Bool {
+            typesSupportedRealmProperty.contains(initialType) || (modelType == .intEnum && !isArray)
         }
         
         var realmSupportedDefaultValue: String? {
@@ -49,17 +47,28 @@ extension DAOMacro {
             }
         }
         
-        var isOptionalInDatabaseModel: Bool {
-            shouldUseRealmProperty || (isOptional && typeName == "URL") || modelType == .stringEnum
+        var isEnumType: Bool {
+            switch modelType {
+            case .intEnum, .stringEnum:
+                return true
+            default:
+                return false
+            }
         }
         
-        var typeName: String {
+        var isShouldUseDefaultValueWhileTranlateFromModel: Bool {
+            isShouldUseRealmProperty || isEnumType || initialType == "URL?"
+        }
+        
+        var isShouldUnwrapWhileTranlateFromModel: Bool {
+            isEnumType || initialType == "URL"
+        }
+        
+        var clearTypeName: String {
             initialType
                 .trimmingCharacters(in: CharacterSet(charactersIn: "[]?"))
                 .trimmingCharacters(in: CharacterSet(charactersIn: "?"))
         }
-        
-        // MARK: - Useful
         
         var defaultValue: String {
             guard !isArray else {
@@ -77,11 +86,20 @@ extension DAOMacro {
             }
         }
         
-        var optionalUnwrapString: String {
-            guard isOptionalInDatabaseModel else {
+        // MARK: - MacrosStrings
+        
+        var defaultValueUnwrapString: String {
+            guard isShouldUseDefaultValueWhileTranlateFromModel else {
                 return ""
             }
             return " ?? \(defaultValue)"
+        }
+        
+        var unsafelyUnwrappedString: String {
+            guard isShouldUnwrapWhileTranlateFromModel else {
+                return ""
+            }
+            return ".unsafelyUnwrapped"
         }
     }
 }
