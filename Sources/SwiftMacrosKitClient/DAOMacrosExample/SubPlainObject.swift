@@ -9,6 +9,7 @@ import SDAO
 import RealmSwift
 import Foundation
 import SwiftMacrosKit
+import Monreau
 
 // MARK: - SubPlainObject
 
@@ -60,4 +61,36 @@ public struct SubPlainObject: Equatable, Codable {
     
     /// @dao-string-enum
     public let stringEnumOptionalArray: [StringEnum]?
+}
+
+func a(model: SubPlainObject.DatabaseModel) -> SubPlainObject {
+    SubPlainObject(
+        id: model.id,
+        optionalString: model.optionalString ?? "",
+        string: model.string,
+        double: model.double,
+        optionalDouble: model.optionalDouble.value ?? 0,
+        url: URL(string: model.url).unsafelyUnwrapped, // here
+        optionalUrl: URL(string: model.optionalUrl ?? "").unsafelyUnwrapped, // here
+        date: model.date,
+        optionalDate: model.optionalDate ?? Date(),
+        int: model.int,
+        optionalInt: model.optionalInt.value ?? 0,
+        intEnum: IntEnum(rawValue: model.intEnum.value ?? 0) ?? .case1, // here
+        intEnumOptional: IntEnum(rawValue: model.intEnumOptional.value ?? 0), // here
+        intEnumArray: model.intEnumArray.compactMap({ // here
+                IntEnum(rawValue: $0)
+            }),
+        intEnumArrayOptional: model.intEnumArrayOptional.compactMap({
+                IntEnum(rawValue: $0)
+            }),
+        stringEnum: StringEnum(rawValue: model.stringEnum ?? "").unsafelyUnwrapped, // here
+        stringEnumOptional: StringEnum(rawValue: model.stringEnumOptional ?? ""),
+        stringEnumArray: model.stringEnumArray.compactMap({
+                StringEnum(rawValue: $0)
+            }),
+        stringEnumOptionalArray: model.stringEnumOptionalArray.compactMap({
+                StringEnum(rawValue: $0)
+            })
+    )
 }

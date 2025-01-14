@@ -9,18 +9,19 @@ import SDAO
 import RealmSwift
 import Foundation
 import SwiftMacrosKit
+import Monreau
 
 // MARK: - MainPlainObject
 
 @DAOMacro
 public struct MainPlainObject: Equatable, Codable {
-
+    
     public var uniqueId: UniqueID {
         UniqueID(rawValue: id)
     }
     
     public static let staticVariable = "staticVariable"
-
+    
     // MARK: - Primitive
     
     public let id: String
@@ -34,7 +35,7 @@ public struct MainPlainObject: Equatable, Codable {
     public let optionalDate: Date?
     public let int: Int
     public let optionalInt: Int?
-
+    
     // MARK: - IntEnum
     
     /// @dao-int-enum
@@ -48,9 +49,9 @@ public struct MainPlainObject: Equatable, Codable {
     
     /// @dao-int-enum
     public let intEnumArrayOptional: [IntEnum]?
-
+    
     // MARK: - StringEnum
-
+    
     /// @dao-string-enum
     public let stringEnum: StringEnum
     
@@ -63,9 +64,9 @@ public struct MainPlainObject: Equatable, Codable {
     
     /// @dao-string-enum
     public let stringEnumOptionalArray: [StringEnum]?
-
+    
     // MARK: - OtherPlain
-
+    
     /// @dao-plain
     public let plain: SubPlainObject
     
@@ -78,3 +79,4 @@ public struct MainPlainObject: Equatable, Codable {
     /// @dao-plain
     public let optionalPlainArray: [SubPlainObject]?
 }
+
