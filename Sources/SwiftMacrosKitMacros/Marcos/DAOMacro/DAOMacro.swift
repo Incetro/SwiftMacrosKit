@@ -99,42 +99,53 @@ extension DAOMacro: ExtensionMacro {
 
 extension DAOMacro {
     
-    static func makeInitVariableString(
-        modelValuePath: String,
-        property: PropertyPlain
-    ) -> String {
-        switch property.isArray {
-        case true:
-            switch property.modelType {
-            case .stringEnum, .intEnum:
-                return "\(property.name): \(modelValuePath).compactMap({ \(property.clearTypeName)(rawValue: $0) })"
-            case .primitive:
-                switch property.clearTypeName {
-                case "URL":
-                return "\(property.name): \(modelValuePath).compactMap({ \(property.clearTypeName)(string: $0) })"
-                default:
-                    return "\(property.name): \(modelValuePath)"
-                }
-            case .plain:
-                return "\(property.name): try \(property.clearTypeName).Translator(configuration: configuration).translate(models: Array(\(modelValuePath)\(property.defaultValueUnwrapString)))"
+    static func extractPropeties(plainName: String, members: MemberBlockItemListSyntax) -> [PropertyPlain] {
+        members.compactMap { member -> PropertyPlain? in
+            guard let variable = member.decl.as(VariableDeclSyntax.self),
+                  let binding = variable.bindings.first,
+                  let identifier = binding.pattern.as(IdentifierPatternSyntax.self),
+                  let typeAnnotation = binding.typeAnnotation else {
+                return nil
             }
-        case false:
-            switch property.modelType {
-            case .stringEnum, .intEnum:
-                return "\(property.name): \(property.clearTypeName)(rawValue: \(modelValuePath)\(property.defaultValueUnwrapString))\(property.unsafelyUnwrappedString)"
-            case .primitive:
-                switch property.clearTypeName {
-                case "URL":
-                    return "\(property.name): URL(string: \(modelValuePath)\(property.defaultValueUnwrapString))\(property.unsafelyUnwrappedString)"
-                default:
-                    return "\(property.name): \(modelValuePath)\(property.defaultValueUnwrapString)"
+            
+            for modifier in variable.modifiers {
+                if modifier.as(DeclModifierSyntax.self)?.name.text == "static" {
+                    return nil
                 }
-            case .plain:
-                if property.isOptional {
-                    return "\(property.name): \(modelValuePath) == nil ? nil : try \(property.clearTypeName).Translator(configuration: configuration).translate(model: \(modelValuePath).unsafelyUnwrapped)"
-                }
-                return "\(property.name): try \(property.clearTypeName).Translator(configuration: configuration).translate(model: \(modelValuePath).unsafelyUnwrapped)"
             }
+            
+            let name = identifier.identifier.text
+            let initialType = typeAnnotation.type.description.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard initialType != "UniqueID" else {
+                return nil
+            }
+            let isArray = initialType.hasPrefix("[") && (initialType.hasSuffix("]") || initialType.hasSuffix("]?"))
+            let isOptional = initialType.hasSuffix("?")
+            let docComment = variable.leadingTrivia
+                .compactMap ({ piece in
+                    switch piece {
+                    case let .docLineComment(comment): return comment
+                    default: return nil
+                    }
+                })
+                .joined(separator: " ")
+            let modelType = annotations.first { docComment.contains($0.key) }?.value ?? .primitive
+            let realmSupportedType = detectRealmSupportedType(
+                isArray: isArray,
+                initialType: initialType,
+                modelType: modelType
+            )
+            let plain = PropertyPlain(
+                plainName: plainName,
+                name: name,
+                realmSupportedType: realmSupportedType,
+                initialType: initialType,
+                modelType: modelType,
+                isArray: isArray,
+                isOptional: isOptional
+            )
+            dump(plain)
+            return plain
         }
     }
 }

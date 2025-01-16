@@ -48,56 +48,6 @@ extension DAOMacro {
         return DeclSyntax(stringLiteral: modelClass)
     }
     
-    static func extractPropeties(plainName: String, members: MemberBlockItemListSyntax) -> [PropertyPlain] {
-        members.compactMap { member -> PropertyPlain? in
-            guard let variable = member.decl.as(VariableDeclSyntax.self),
-                  let binding = variable.bindings.first,
-                  let identifier = binding.pattern.as(IdentifierPatternSyntax.self),
-                  let typeAnnotation = binding.typeAnnotation else {
-                return nil
-            }
-            
-            for modifier in variable.modifiers {
-                if modifier.as(DeclModifierSyntax.self)?.name.text == "static" {
-                    return nil
-                }
-            }
-            
-            let name = identifier.identifier.text
-            let initialType = typeAnnotation.type.description.trimmingCharacters(in: .whitespacesAndNewlines)
-            guard initialType != "UniqueID" else {
-                return nil
-            }
-            let isArray = initialType.hasPrefix("[") && (initialType.hasSuffix("]") || initialType.hasSuffix("]?"))
-            let isOptional = initialType.hasSuffix("?")
-            let docComment = variable.leadingTrivia
-                .compactMap ({ piece in
-                    switch piece {
-                    case let .docLineComment(comment): return comment
-                    default: return nil
-                    }
-                })
-                .joined(separator: " ")
-            let modelType = annotations.first { docComment.contains($0.key) }?.value ?? .primitive
-            let realmSupportedType = detectRealmSupportedType(
-                isArray: isArray,
-                initialType: initialType,
-                modelType: modelType
-            )
-            let plain = PropertyPlain(
-                plainName: plainName,
-                name: name,
-                realmSupportedType: realmSupportedType,
-                initialType: initialType,
-                modelType: modelType,
-                isArray: isArray,
-                isOptional: isOptional
-            )
-            dump(plain)
-            return plain
-        }
-    }
-    
     static func detectRealmSupportedType(isArray: Bool, initialType: String, modelType: ModelType) -> String {
         let initialType = isArray
         ? initialType.trimmingCharacters(in: CharacterSet(charactersIn: "[]?"))

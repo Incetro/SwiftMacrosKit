@@ -65,14 +65,16 @@ extension DAOMacro {
     
     static func generateModelToPlainMapping(properties: [PropertyPlain]) -> String {
         properties.map { property in
-            makeInitVariableString(
-                modelValuePath: "model.\(property.name)\(property.isShouldUseRealmProperty ? ".value" : "")",
-                property: property
-            )
+            let modelValuePath = "model.\(property.name)\(property.isShouldUseRealmProperty ? ".value" : "")"
+            return "\(property.name): \(property.plainValueInitString(valuePath: modelValuePath))"
         }.joined(separator: ",\n")
     }
     
     static func generatePlainToModelMapping(properties: [PropertyPlain]) -> String {
         return ""
+//        properties.map { property in
+//            let plainValuePath = "plain.\(property.name)"
+//            return "databaseModel.\(property.name) = \(property.modelValueInitString(valuePath: plainValuePath))"
+//        }.joined(separator: "\n")
     }
 }
