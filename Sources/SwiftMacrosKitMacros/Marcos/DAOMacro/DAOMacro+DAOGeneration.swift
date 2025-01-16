@@ -1,5 +1,5 @@
 //
-//  DAOMacro+DAOGeneration.swift
+//  DAOPlainMacro+DAOGeneration.swift
 //  SwiftMacrosKit
 //
 //  Created by Gleb Kovalenko on 14.01.2025.
@@ -10,9 +10,9 @@ import SwiftSyntaxMacros
 import SwiftDiagnostics
 import Foundation
 
-// MARK: - DAOMacro+DAOGeneration
+// MARK: - DAOPlainMacro+DAOGeneration
 
-extension DAOMacro {
+extension DAOPlainMacro {
     
     static func makeDAOAlias(plainName: String) -> DeclSyntax {
         let daoAlias = """

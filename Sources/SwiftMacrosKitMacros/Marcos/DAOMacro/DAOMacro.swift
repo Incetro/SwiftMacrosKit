@@ -1,5 +1,5 @@
 //
-//  DAOMacro.swift
+//  DAOPlainMacro.swift
 //  SwiftMacrosKit
 //
 //  Created by Gleb Kovalenko on 10.01.2025.
@@ -10,47 +10,79 @@ import SwiftSyntaxMacros
 import SwiftDiagnostics
 import Foundation
 
-// MARK: - DAOMacro
+// MARK: - DAOPlainMacro
 
-public struct DAOMacro {
+/// A structure representing the core logic for generating data access object (DAO) components.
+///
+/// The `DAOPlainMacro` contains metadata, configurations, and utilities for generating
+/// Realm-compatible database models and translators from annotated plain object structures.
+/// It defines types, annotations, and utility functions used throughout the macro's implementation.
+public struct DAOPlainMacro {
     
     // MARK: - ModelType
     
+    /// Represents the type of a property within a plain object.
+    ///
+    /// This is determined based on annotations or the property's inferred type.
     enum ModelType {
         
         // MARK: - Cases
         
+        /// A property that is an enumerated type with a `String` raw value.
         case stringEnum
+        
+        /// A property that is an enumerated type with an `Int` raw value.
         case intEnum
+        
+        /// A property that is another plain object type.
         case plain
+        
+        /// A primitive property (e.g., `String`, `Int`, etc.).
         case primitive
     }
     
     // MARK: - TranslateType
     
+    /// Represents the direction of translation between plain objects and database models.
     enum TranslateType {
 
         // MARK: - Cases
         
+        /// Translation from the database model to the plain object.
         case fromModelToPlain
+        
+        /// Translation from the plain object to the database model.
         case fromPlainToModel
     }
     
     // MARK: - Properties
     
+    /// A list of numeric types supported by the macro.
+    ///
+    /// These types can be wrapped in `RealmProperty` for optionality support.
     static let numericTypes = [
         "Int", "Int8", "Int16", "Int32", "Int64",
         "Float", "Double"
     ]
     
+    /// A list of types supported by `RealmProperty`.
+    ///
+    /// Includes optional numeric types and other Realm-compatible types.
     static var typesSupportedRealmProperty = numericTypes.map { "\($0)?" } + [
         "Bool?"
     ]
     
+    /// A list of string-like types supported by the macro.
+    ///
+    /// These types are often mapped to `String` in the database model.
     static let stringTypes = [
         "String", "URL"
     ]
     
+    /// A mapping of annotations to `ModelType` values.
+    ///
+    /// Annotations are used in documentation comments to explicitly define a property's type
+    /// (e.g., plain, integer enum, string enum).
     static let annotations: [String: ModelType] = [
         "@dao-string-enum": .stringEnum,
         "@dao-int-enum": .intEnum,
@@ -60,7 +92,7 @@ public struct DAOMacro {
 
 // MARK: - MemberMacro
 
-extension DAOMacro: MemberMacro {
+extension DAOPlainMacro: MemberMacro {
     
     public static func expansion(
         of attribute: AttributeSyntax,
@@ -87,7 +119,7 @@ extension DAOMacro: MemberMacro {
 
 // MARK: - ExtensionMacro
 
-extension DAOMacro: ExtensionMacro {
+extension DAOPlainMacro: ExtensionMacro {
     
     /// Expands the macro to add `Identifiable, Plain` conformance to the struct.
     public static func expansion(
@@ -107,14 +139,30 @@ extension DAOMacro: ExtensionMacro {
 
 // MARK: - Useful
 
-extension DAOMacro {
+extension DAOPlainMacro {
     
+    /// Extracts the properties of a plain object for further processing.
+    ///
+    /// This method parses the members of a struct declaration to identify
+    /// its properties, extracting metadata such as:
+    /// - Name, type, and whether it is optional or an array.
+    /// - Model type based on annotations (e.g., `@dao-plain`, `@dao-int-enum`).
+    /// - Realm-compatible type for database model generation.
+    ///
+    /// This method also filters out unsupported members, such as static variables,
+    /// computed properties, methods, and specific excluded types like `UniqueID`.
+    ///
+    /// - Parameters:
+    ///   - plainName: The name of the plain object (used for nested type references).
+    ///   - members: The list of members in the struct declaration.
+    /// - Returns: An array of `PropertyPlain` objects representing the extracted properties.
     static func extractPropeties(plainName: String, members: MemberBlockItemListSyntax) -> [PropertyPlain] {
         members.compactMap { member -> PropertyPlain? in
             guard let variable = member.decl.as(VariableDeclSyntax.self),
                   let binding = variable.bindings.first,
                   let identifier = binding.pattern.as(IdentifierPatternSyntax.self),
-                  let typeAnnotation = binding.typeAnnotation else {
+                  let typeAnnotation = binding.typeAnnotation,
+                  binding.accessorBlock == nil else {
                 return nil
             }
             

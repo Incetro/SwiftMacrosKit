@@ -9,7 +9,7 @@ import XCTest
 import SwiftMacrosKitMacros
 
 let testMacros: [String: Macro.Type] = [
-    "DAOMacro": DAOMacro.self,
+    "DAOPlainMacro": DAOPlainMacro.self,
 ]
 #endif
 
@@ -19,7 +19,7 @@ final class SwiftMacrosKitTests: XCTestCase {
         #if canImport(SwiftMacrosKitMacros)
         assertMacroExpansion(
             """
-            @DAOMacro
+            @DAOPlain
             public struct MainPlainObject: Equatable, Codable {
                 
                 public var uniqueId: UniqueID {

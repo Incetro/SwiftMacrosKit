@@ -44,8 +44,6 @@ public struct ClosureAccessorMacro: AccessorMacro {
         let propertyName = identifier.identifier.text
         let closureName = "\(propertyName)Closure"
 
-        // Determine if the property is optional
-        let isOptional = binding.typeAnnotation?.type.description.contains("?") ?? false
         let accessorCode = "\(closureName)()"
 
         // Generate the `get` accessor that retrieves the value using the closure

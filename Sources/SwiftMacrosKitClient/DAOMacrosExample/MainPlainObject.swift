@@ -6,14 +6,14 @@
 //
 
 import SDAO
-import RealmSwift
 import Foundation
+import RealmSwift
 import SwiftMacrosKit
 import Monreau
 
 // MARK: - MainPlainObject
 
-@DAOMacro
+@DAOPlain
 public struct MainPlainObject: Equatable, Codable {
     
     public var uniqueId: UniqueID {

@@ -1,5 +1,5 @@
 //
-//  DAOMacro+TranslatorGeneration.swift
+//  DAOPlainMacro+TranslatorGeneration.swift
 //  SwiftMacrosKit
 //
 //  Created by Gleb Kovalenko on 14.01.2025.
@@ -10,10 +10,22 @@ import SwiftSyntaxMacros
 import SwiftDiagnostics
 import Foundation
 
-// MARK: - DAOMacro+TranslatorGeneration
+// MARK: - DAOPlainMacro+TranslatorGeneration
 
-extension DAOMacro {
+extension DAOPlainMacro {
     
+    /// This function generates the `Translator` class for a given plain object.
+    /// The `Translator` class is responsible for translating between the `PlainModel`
+    /// and `DatabaseModel` and managing their persistence in the database.
+    ///
+    /// The generated translator includes:
+    /// - Translation methods (`translate` and `translate(from:to:)`) for both directions.
+    /// - A `RealmStorage` instance for database management.
+    ///
+    /// - Parameters:
+    ///   - plainName: The name of the plain object.
+    ///   - properties: A list of properties to include in the translation logic.
+    /// - Returns: A `DeclSyntax` object representing the translator class.
     static func makeTranslator(plainName: String, properties: [PropertyPlain]) -> DeclSyntax {
         let translatorClass = """
         // MARK: - Translator
@@ -63,6 +75,14 @@ extension DAOMacro {
         return DeclSyntax(stringLiteral: translatorClass)
     }
     
+    /// Generates the mapping logic for translating a `DatabaseModel`
+    /// into a `PlainModel`.
+    ///
+    /// Each property in the database model is mapped to its corresponding property
+    /// in the plain model. Special handling is applied for enums, arrays, and optional properties.
+    ///
+    /// - Parameter properties: The list of properties to include in the mapping.
+    /// - Returns: A string representing the mapping logic.
     static func generateModelToPlainMapping(properties: [PropertyPlain]) -> String {
         properties.map { property in
             let modelValuePath = "model.\(property.name)\(property.isShouldUseRealmProperty ? ".value" : "")"
@@ -71,6 +91,14 @@ extension DAOMacro {
         }.joined(separator: ",\n")
     }
     
+    /// Generates the mapping logic for translating a `PlainModel`
+    /// into a `DatabaseModel`.
+    ///
+    /// Each property in the plain model is mapped to its corresponding property
+    /// in the database model. Special handling is applied for enums, arrays, and optional properties.
+    ///
+    /// - Parameter properties: The list of properties to include in the mapping.
+    /// - Returns: A string representing the mapping logic.
     static func generatePlainToModelMapping(properties: [PropertyPlain]) -> String {
         properties.map { property in
             let plainValuePath = "plain.\(property.name)"

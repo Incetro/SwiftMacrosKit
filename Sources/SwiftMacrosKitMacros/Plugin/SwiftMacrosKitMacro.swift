@@ -10,6 +10,6 @@ struct SwiftMacrosKitPlugin: CompilerPlugin {
         WithLocalizationUpdaterMacro.self,
         ClosureAccessorMacro.self,
         AutoInitMacro.self,
-        DAOMacro.self
+        DAOPlainMacro.self
     ]
 }
