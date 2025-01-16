@@ -18,12 +18,12 @@ extension DAOMacro {
         let translatorClass = """
         // MARK: - Translator
         
-        final class Translator: SDAO.Translator {
+        public final class Translator: SDAO.Translator {
         
             // MARK: - Aliases
         
-            typealias PlainModel = \(plainName)
-            typealias DatabaseModel = \(plainName).DatabaseModel
+            public typealias PlainModel = \(plainName)
+            public typealias DatabaseModel = \(plainName).DatabaseModel
         
             /// Plain storage
             private lazy var storage = RealmStorage<DatabaseModel>(configuration: self.configuration)
@@ -36,23 +36,23 @@ extension DAOMacro {
             /// Default initializer
             /// - Parameters:
             ///   - configuration: current realm db config
-            init(configuration: RealmConfiguration) {
+            public init(configuration: RealmConfiguration) {
                 self.configuration = configuration
             }
         
-            func translate(model: DatabaseModel) throws -> PlainModel {
+            public func translate(model: DatabaseModel) throws -> PlainModel {
                 \(plainName)(
                     \(generateModelToPlainMapping(properties: properties))
                 )
             }
         
-            func translate(plain: PlainModel) throws -> DatabaseModel {
+            public func translate(plain: PlainModel) throws -> DatabaseModel {
                 let model = try storage.read(byPrimaryKey: plain.uniqueId.rawValue) ?? DatabaseModel()
                 try translate(from: plain, to: model)
                 return model
             }
         
-            func translate(from plain: PlainModel, to databaseModel: DatabaseModel) throws {
+            public func translate(from plain: PlainModel, to databaseModel: DatabaseModel) throws {
                 if databaseModel.uniqueId.isEmpty {
                     databaseModel.uniqueId = plain.uniqueId.rawValue
                 }
@@ -66,15 +66,21 @@ extension DAOMacro {
     static func generateModelToPlainMapping(properties: [PropertyPlain]) -> String {
         properties.map { property in
             let modelValuePath = "model.\(property.name)\(property.isShouldUseRealmProperty ? ".value" : "")"
-            return "\(property.name): \(property.plainValueInitString(valuePath: modelValuePath))"
+            let translateString = property.translate(with: .fromModelToPlain, valuePath: modelValuePath)
+            return "\(property.name): \(translateString)"
         }.joined(separator: ",\n")
     }
     
     static func generatePlainToModelMapping(properties: [PropertyPlain]) -> String {
-        return ""
-//        properties.map { property in
-//            let plainValuePath = "plain.\(property.name)"
-//            return "databaseModel.\(property.name) = \(property.modelValueInitString(valuePath: plainValuePath))"
-//        }.joined(separator: "\n")
+        properties.map { property in
+            let plainValuePath = "plain.\(property.name)"
+            let databaseValuePath = "databaseModel.\(property.name)\(property.isShouldUseRealmProperty ? ".value" : "")"
+            let translateString = property.translate(with: .fromPlainToModel, valuePath: plainValuePath)
+            if property.isArray {
+                return "databaseModel.\(property.name).removeAll()\n" + "\(databaseValuePath).append(objectsIn: \(translateString))"
+            } else {
+                return "\(databaseValuePath) = \(translateString)"
+            }
+        }.joined(separator: "\n")
     }
 }

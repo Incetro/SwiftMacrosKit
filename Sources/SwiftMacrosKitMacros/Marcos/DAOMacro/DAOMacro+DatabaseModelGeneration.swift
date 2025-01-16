@@ -38,6 +38,9 @@ extension DAOMacro {
         }
         
         let modelClass = """
+        
+        // MARK: - DatabaseModel
+        
         public final class DatabaseModel: RealmModel {
             
             // MARK: - Properties

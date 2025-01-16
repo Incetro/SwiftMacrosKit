@@ -26,6 +26,16 @@ public struct DAOMacro {
         case primitive
     }
     
+    // MARK: - TranslateType
+    
+    enum TranslateType {
+
+        // MARK: - Cases
+        
+        case fromModelToPlain
+        case fromPlainToModel
+    }
+    
     // MARK: - Properties
     
     static let numericTypes = [
@@ -89,7 +99,7 @@ extension DAOMacro: ExtensionMacro {
     ) throws -> [ExtensionDeclSyntax] {
         
         let equatableExtension = try ExtensionDeclSyntax(
-            "extension \(type.trimmed): Identifiable, Plain {}"
+            "extension \(type.trimmed): SDAO.Plain {}"
         )
         return [equatableExtension]
     }
@@ -144,7 +154,6 @@ extension DAOMacro {
                 isArray: isArray,
                 isOptional: isOptional
             )
-            dump(plain)
             return plain
         }
     }

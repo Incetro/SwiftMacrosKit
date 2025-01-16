@@ -15,6 +15,11 @@ import Foundation
 extension DAOMacro {
     
     static func makeDAOAlias(plainName: String) -> DeclSyntax {
-        return DeclSyntax(stringLiteral: "")
+        let daoAlias = """
+        // MARK: - DAO
+        
+        public typealias DAO = SDAO.DAO<RealmStorage<\(plainName).DatabaseModel>, \(plainName).Translator>
+        """
+        return DeclSyntax(stringLiteral: daoAlias)
     }
 }

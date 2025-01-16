@@ -154,5 +154,5 @@ public macro AutoInit() = #externalMacro(module: "SwiftMacrosKitMacros", type: "
 // MARK: - DAOMacro
 
 @attached(member, names: arbitrary)
-@attached(extension, conformances: Identifiable, Plain)
+@attached(extension, conformances: Plain)
 public macro DAOMacro() = #externalMacro(module: "SwiftMacrosKitMacros", type: "DAOMacro")

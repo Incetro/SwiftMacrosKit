@@ -102,53 +102,63 @@ extension DAOMacro {
             return ".unsafelyUnwrapped"
         }
         
-        func plainValueInitString(valuePath: String) -> String {
-            switch modelType {
+        // MARK: - Useful
+        
+        func initString(for translateType: TranslateType) -> ((String) -> String)? {
+            switch self.modelType {
             case .stringEnum, .intEnum:
-                let initString: (String) -> String = { value in
-                    "\(clearTypeName)(rawValue: \(value)\(defaultValueUnwrapString))\(unsafelyUnwrappedString)"
-                }
-                return isArray ? "\(valuePath).compactMap({ \(initString("$0")) })" : initString(valuePath)
-            case .primitive:
-                switch clearTypeName {
-                case "URL":
-                    let initString: (String) -> String = { value in
-                        "\(clearTypeName)(string: \(valuePath)\(defaultValueUnwrapString))\(unsafelyUnwrappedString)"
+                switch translateType {
+                case .fromModelToPlain:
+                    return { value in
+                        "\(clearTypeName)(rawValue: \(value)\(defaultValueUnwrapString))\(unsafelyUnwrappedString)"
                     }
-                    return isArray ? "\(valuePath).compactMap({ \(initString("$0")) })" : initString(valuePath)
-                default:
-                    return "\(valuePath)\(defaultValueUnwrapString)"
+                case .fromPlainToModel:
+                    return { value in
+                        "\(value).rawValue"
+                    }
                 }
-            case .plain:
-                let translatorInitString = "Translator(configuration: configuration)"
-                let checkNilString = "\(valuePath) == nil ? nil :"
-                let translateString = "translate(\(isArray ? "models: Array(\(valuePath))" : "model: \(valuePath).unsafelyUnwrapped"))"
-                return (isOptional ? checkNilString : "") + "try \(clearTypeName).\(translatorInitString).\(translateString)"
+            case .primitive where clearTypeName == "URL":
+                switch translateType {
+                case .fromModelToPlain:
+                    return { value in
+                        "\(clearTypeName)(string: \(value)\(defaultValueUnwrapString))\(unsafelyUnwrappedString)"
+                    }
+                case .fromPlainToModel:
+                    return { value in
+                        "\(value).absoluteString"
+                    }
+                }
+            default:
+                return nil
             }
         }
         
-        func modelValueInitString(valuePath: String) -> String {
+        func translate(with translateType: TranslateType, valuePath: String) -> String {
             switch modelType {
-            case .stringEnum, .intEnum:
-                let initString: (String) -> String = { value in
-                    "\(clearTypeName)(rawValue: \(value)\(defaultValueUnwrapString))\(unsafelyUnwrappedString)"
+            case .stringEnum, .intEnum,
+                 .primitive where clearTypeName == "URL":
+                let optionalSuffix = translateType == .fromPlainToModel && isOptional ? "?" : ""
+                let arrayUnwrapString = translateType == .fromPlainToModel && isOptional ? " ?? []" : ""
+                guard let initString = initString(for: translateType) else {
+                    return ""
                 }
-                return isArray ? "\(valuePath).compactMap({ \(initString("$0")) })" : initString(valuePath)
+                return isArray ? "\(valuePath)\(optionalSuffix).compactMap({ \(initString("$0")) })\(arrayUnwrapString)" : initString(valuePath + optionalSuffix)
             case .primitive:
-                switch clearTypeName {
-                case "URL":
-                    let initString: (String) -> String = { value in
-                        "\(clearTypeName)(string: \(valuePath)\(defaultValueUnwrapString))\(unsafelyUnwrappedString)"
-                    }
-                    return isArray ? "\(valuePath).compactMap({ \(initString("$0")) })" : initString(valuePath)
-                default:
-                    return "\(valuePath)\(defaultValueUnwrapString)"
-                }
+                let defaultValueUnwrapString = translateType == .fromModelToPlain ? defaultValueUnwrapString : ""
+                return "\(valuePath)\(defaultValueUnwrapString)"
             case .plain:
                 let translatorInitString = "Translator(configuration: configuration)"
-                let checkNilString = "\(valuePath) == nil ? nil :"
-                let translateString = "translate(\(isArray ? "models: Array(\(valuePath))" : "model: \(valuePath).unsafelyUnwrapped"))"
-                return (isOptional ? checkNilString : "") + "try \(clearTypeName).\(translatorInitString).\(translateString)"
+                switch translateType {
+                case .fromModelToPlain:
+                    let checkNilString = isArray ? "" : "\(valuePath) == nil ? nil :"
+                    let translateString = "translate(\(isArray ? "models: Array(\(valuePath))" : "model: \(valuePath).unsafelyUnwrapped"))"
+                    return (isOptional ? checkNilString : "") + "try \(clearTypeName).\(translatorInitString).\(translateString)"
+                case .fromPlainToModel:
+                    let checkNilString = "\(valuePath) == nil ? \(isArray ? "[]" : "nil") : "
+                    let optionalUnwrapString = isOptional ? ".unsafelyUnwrapped" : ""
+                    let translateString = "translate(\(isArray ? "plains: \(valuePath)\(optionalUnwrapString)" : "plain: \(valuePath)\(optionalUnwrapString)"))"
+                    return (isOptional ? checkNilString : "") + "try \(clearTypeName).\(translatorInitString).\(translateString)"
+                }
             }
         }
     }

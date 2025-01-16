@@ -79,4 +79,3 @@ public struct MainPlainObject: Equatable, Codable {
     /// @dao-plain
     public let optionalPlainArray: [SubPlainObject]?
 }
-
