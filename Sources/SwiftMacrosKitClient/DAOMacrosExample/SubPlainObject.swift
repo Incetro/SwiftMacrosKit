@@ -25,8 +25,14 @@ public struct SubPlainObject: Equatable, Codable {
     public static let someStaticProperty = 0
     
     public var someComputedProperty: Int {
+        int
+    }
+    
+    /// @dao-ignore
+    public var ignoredComputedProperty: Int {
         0
     }
+    
     public func someMethod() -> Int {
         0
     }

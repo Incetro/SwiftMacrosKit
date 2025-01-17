@@ -32,6 +32,9 @@ extension DAOPlainMacro {
         /// The property name in the plain model.
         let name: String
         
+        /// Indicates is property computed
+        let isComputed: Bool
+        
         /// The type of the property after adapting to Realm-compatible types.
         let realmSupportedType: String
         
@@ -178,7 +181,10 @@ extension DAOPlainMacro.PropertyPlain {
     ///   - translateType: The type of translation (`fromModelToPlain` or `fromPlainToModel`).
     ///   - valuePath: The value path to be translated.
     /// - Returns: A string representing the translation logic.
-    func translate(with translateType: DAOPlainMacro.TranslateType, valuePath: String) -> String {
+    func translate(with translateType: DAOPlainMacro.TranslateType, valuePath: String) -> String? {
+        guard translateType != .fromModelToPlain || !isComputed else {
+            return nil
+        }
         switch modelType {
         case .stringEnum, .intEnum,
              .primitive where clearTypeName == "URL":

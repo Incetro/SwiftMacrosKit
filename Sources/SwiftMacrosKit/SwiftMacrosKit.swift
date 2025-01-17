@@ -165,6 +165,7 @@ public macro AutoInit() = #externalMacro(module: "SwiftMacrosKitMacros", type: "
 ///
 /// #### Features:
 /// - Supports primitive types, enums (`@dao-int-enum`, `@dao-string-enum`), and nested plain objects (`@dao-plain`).
+/// - Support ignoring value with `@dao-ignore`
 /// - Handles arrays and optional properties.
 /// - Provides default values for primitive properties in the generated `DatabaseModel`.
 /// - Manages custom translation logic for nested models, enums, and Realm-specific requirements.
@@ -182,6 +183,11 @@ public macro AutoInit() = #externalMacro(module: "SwiftMacrosKitMacros", type: "
 ///     public let id: String
 ///     public let name: String
 ///     public let age: Int
+///
+///     @dao-ignore
+///     public var agePlusTen: Int {
+///         age + 10
+///     }
 ///
 ///     // Enum Properties
 ///     /// @dao-int-enum

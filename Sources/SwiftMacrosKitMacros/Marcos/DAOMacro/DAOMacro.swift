@@ -89,6 +89,8 @@ public struct DAOPlainMacro {
         "@dao-plain": .plain
     ]
     
+    static let ignoreAnnontation = "@dao-ignore"
+    
     /// Variables name that are can't use in model
     static let variablesNameToRenameInModel: [String: String] = [
         "description": "descriptionValue"
@@ -166,8 +168,7 @@ extension DAOPlainMacro {
             guard let variable = member.decl.as(VariableDeclSyntax.self),
                   let binding = variable.bindings.first,
                   let identifier = binding.pattern.as(IdentifierPatternSyntax.self),
-                  let typeAnnotation = binding.typeAnnotation,
-                  binding.accessorBlock == nil else {
+                  let typeAnnotation = binding.typeAnnotation else {
                 return nil
             }
             
@@ -192,6 +193,9 @@ extension DAOPlainMacro {
                     }
                 })
                 .joined(separator: " ")
+            guard !docComment.contains(ignoreAnnontation) else {
+                return nil
+            }
             let modelType = annotations.first { docComment.contains($0.key) }?.value ?? .primitive
             let realmSupportedType = detectRealmSupportedType(
                 isArray: isArray,
@@ -202,6 +206,7 @@ extension DAOPlainMacro {
                 plainName: plainName,
                 modelName: variablesNameToRenameInModel[name] ?? name,
                 name: name,
+                isComputed: binding.accessorBlock != nil,
                 realmSupportedType: realmSupportedType,
                 initialType: initialType,
                 modelType: modelType,

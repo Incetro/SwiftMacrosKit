@@ -9,7 +9,7 @@ import XCTest
 import SwiftMacrosKitMacros
 
 let testMacros: [String: Macro.Type] = [
-    "DAOPlainMacro": DAOPlainMacro.self,
+    "DAOPlain": DAOPlainMacro.self,
 ]
 #endif
 
@@ -27,6 +27,53 @@ final class SwiftMacrosKitTests: XCTestCase {
                 }
                 
                 public static let staticVariable = "staticVariable"
+            
+                public var someComputedProperty: Int {
+                    int
+                }
+                
+                /// @dao-ignore
+                public var ignoredComputedProperty: Int {
+                    0
+                }
+            
+                /// @dao-int-enum
+                public var complexComptuedIntEnum: IntEnum {
+                    switch stringEnum {
+                    case .case1:
+                        return .case1
+                    case .case2:
+                        return .case2
+                    }
+                }
+                
+                /// @dao-string-enum
+                public var complexComptuedStringEnum: StringEnum {
+                    switch intEnum {
+                    case .case1:
+                        return .case1
+                    case .case2:
+                        return .case2
+                    }
+                }
+                
+                public var complexComputedInt: Int {
+                    switch stringEnum {
+                    case .case1:
+                        return 0
+                    case .case2:
+                        return 1
+                    }
+                }
+                
+                public var complexComputedString: String {
+                    switch stringEnum {
+                    case .case1:
+                        return ""
+                    case .case2:
+                        return ""
+                    }
+                }
                 
                 // MARK: - Primitive
                 
@@ -35,6 +82,7 @@ final class SwiftMacrosKitTests: XCTestCase {
                 public let string: String
                 public let double: Double
                 public let optionalDouble: Double?
+                public let description: String
                 public let url: URL
                 public let optionalUrl: URL?
                 public let date: Date
