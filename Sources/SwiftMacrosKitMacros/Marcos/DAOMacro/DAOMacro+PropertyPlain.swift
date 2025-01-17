@@ -26,6 +26,9 @@ extension DAOPlainMacro {
         /// The name of the plain object.
         let plainName: String
         
+        /// Model name
+        let modelName: String
+        
         /// The property name in the plain model.
         let name: String
         

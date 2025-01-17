@@ -88,6 +88,11 @@ public struct DAOPlainMacro {
         "@dao-int-enum": .intEnum,
         "@dao-plain": .plain
     ]
+    
+    /// Variables name that are can't use in model
+    static let variablesNameToRenameInModel: [String: String] = [
+        "description": "descriptionValue"
+    ]
 }
 
 // MARK: - MemberMacro
@@ -106,7 +111,7 @@ extension DAOPlainMacro: MemberMacro {
             plainName: structDecl.name.text,
             members: structDecl.memberBlock.members
         )
-        let modelClass = makeModel(properties: properties)
+        let modelClass = makeModel(properties: properties, plainName: structDecl.name.text)
         let translatorClass = makeTranslator(plainName: structDecl.name.text, properties: properties)
         let daoAlias = makeDAOAlias(plainName: structDecl.name.text)
         return [
@@ -195,6 +200,7 @@ extension DAOPlainMacro {
             )
             let plain = PropertyPlain(
                 plainName: plainName,
+                modelName: variablesNameToRenameInModel[name] ?? name,
                 name: name,
                 realmSupportedType: realmSupportedType,
                 initialType: initialType,

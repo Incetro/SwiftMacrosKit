@@ -219,6 +219,7 @@ public macro AutoInit() = #externalMacro(module: "SwiftMacrosKitMacros", type: "
 ///
 ///   Example of a generated `DatabaseModel`:
 ///   ```swift
+///   @objc(MyPlainObjectDatabaseModel)
 ///   public final class DatabaseModel: RealmModel {
 ///
 ///       // MARK: - Properties

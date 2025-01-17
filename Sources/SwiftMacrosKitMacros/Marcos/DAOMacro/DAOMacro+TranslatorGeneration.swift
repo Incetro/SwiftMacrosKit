@@ -85,7 +85,7 @@ extension DAOPlainMacro {
     /// - Returns: A string representing the mapping logic.
     static func generateModelToPlainMapping(properties: [PropertyPlain]) -> String {
         properties.map { property in
-            let modelValuePath = "model.\(property.name)\(property.isShouldUseRealmProperty ? ".value" : "")"
+            let modelValuePath = "model.\(property.modelName)\(property.isShouldUseRealmProperty ? ".value" : "")"
             let translateString = property.translate(with: .fromModelToPlain, valuePath: modelValuePath)
             return "\(property.name): \(translateString)"
         }.joined(separator: ",\n")
@@ -102,10 +102,10 @@ extension DAOPlainMacro {
     static func generatePlainToModelMapping(properties: [PropertyPlain]) -> String {
         properties.map { property in
             let plainValuePath = "plain.\(property.name)"
-            let databaseValuePath = "databaseModel.\(property.name)\(property.isShouldUseRealmProperty ? ".value" : "")"
+            let databaseValuePath = "databaseModel.\(property.modelName)\(property.isShouldUseRealmProperty ? ".value" : "")"
             let translateString = property.translate(with: .fromPlainToModel, valuePath: plainValuePath)
             if property.isArray {
-                return "databaseModel.\(property.name).removeAll()\n" + "\(databaseValuePath).append(objectsIn: \(translateString))"
+                return "databaseModel.\(property.modelName).removeAll()\n" + "\(databaseValuePath).append(objectsIn: \(translateString))"
             } else {
                 return "\(databaseValuePath) = \(translateString)"
             }

@@ -27,13 +27,13 @@ extension DAOPlainMacro {
     ///   - properties: An array of `PropertyPlain` representing the properties
     ///                 of the plain object.
     /// - Returns: A `DeclSyntax` object representing the generated `DatabaseModel` class.
-    static func makeModel(properties: [PropertyPlain]) -> DeclSyntax {
+    static func makeModel(properties: [PropertyPlain], plainName: String) -> DeclSyntax {
         var realmProperties: [String] = []
         
         for property in properties {
             switch property.isArray {
             case true:
-                realmProperties.append("let \(property.name) = RealmSwift.List<\(property.realmSupportedType)>()")
+                realmProperties.append("let \(property.modelName) = RealmSwift.List<\(property.realmSupportedType)>()")
             case false:
                 let propertyDeclaration: String
                 switch property.isOptional {
@@ -41,7 +41,7 @@ extension DAOPlainMacro {
                     propertyDeclaration = makeOptionalObjcType(property: property)
                 case false:
                     if let defaultValue = property.realmSupportedDefaultValue {
-                        propertyDeclaration = "@objc dynamic var \(property.name): \(property.realmSupportedType) = \(defaultValue)"
+                        propertyDeclaration = "@objc dynamic var \(property.modelName): \(property.realmSupportedType) = \(defaultValue)"
                     } else {
                         propertyDeclaration = makeOptionalObjcType(property: property)
                     }
@@ -54,6 +54,7 @@ extension DAOPlainMacro {
         
         // MARK: - DatabaseModel
         
+        @objc(\(plainName)DatabaseModel)
         public final class DatabaseModel: RealmModel {
             
             // MARK: - Properties
@@ -102,9 +103,9 @@ extension DAOPlainMacro {
     /// - Returns: A string representing the property declaration.
     static func makeOptionalObjcType(property: PropertyPlain) -> String {
         if property.isShouldUseRealmProperty {
-            return "let \(property.name) = RealmProperty<\(property.realmSupportedType)?>()"
+            return "let \(property.modelName) = RealmProperty<\(property.realmSupportedType)?>()"
         } else {
-            return "@objc dynamic var \(property.name): \(property.realmSupportedType)? = nil"
+            return "@objc dynamic var \(property.modelName): \(property.realmSupportedType)? = nil"
         }
     }
 }

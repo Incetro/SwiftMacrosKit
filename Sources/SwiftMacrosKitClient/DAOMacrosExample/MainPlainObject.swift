@@ -29,6 +29,7 @@ public struct MainPlainObject: Equatable, Codable {
     public let string: String
     public let double: Double
     public let optionalDouble: Double?
+    public let description: String
     public let url: URL
     public let optionalUrl: URL?
     public let date: Date
