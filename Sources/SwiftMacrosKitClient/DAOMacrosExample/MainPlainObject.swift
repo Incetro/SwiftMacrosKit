@@ -34,6 +34,7 @@ public struct MainPlainObject: Equatable, Codable {
     public let optionalUrl: URL?
     public let date: Date
     public let optionalDate: Date?
+    public let someBool: Bool
     public let int: Int
     public let optionalInt: Int?
     

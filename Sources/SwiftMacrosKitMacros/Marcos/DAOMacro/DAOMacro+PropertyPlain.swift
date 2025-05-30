@@ -70,6 +70,8 @@ extension DAOPlainMacro.PropertyPlain {
             return "\"\""
         case "Date":
             return "Date()"
+        case "Bool":
+            return "false"
         default:
             return nil
         }
