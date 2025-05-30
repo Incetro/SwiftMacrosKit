@@ -20,7 +20,7 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-syntax.git", from: "509.1.1"),
-        .package(url: "https://github.com/Incetro/DAO.git", branch: "master")
+        .package(url: "https://github.com/Incetro/DAO.git", from: "2.5.5")
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
